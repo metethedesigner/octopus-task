@@ -4,16 +4,12 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function LoginPage(): JSX.Element {
   const [showPassword, setShowPassword] = useState(false);
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    // Handle login logic here
-  };
 
   return (
     <div className="flex h-screen">
-      {/* Left Section with Image and Text */}
+      {/* Sol Taraftaki Alan */}
       <div className="w-2/3 bg-gray-100 flex flex-col items-center justify-center p-10">
-        {/* Logo at the top */}
+        {/* Logo */}
         <div className="absolute top-8 left-8">
           <Image
             src="/assets/images/octopus-logo.png"
@@ -44,7 +40,7 @@ export default function LoginPage(): JSX.Element {
         </div>
       </div>
 
-      {/* Right Section with Login Form */}
+      {/* Sağ taraftaki login formu alanı */}
       <div className="bg-white w-1/2 flex flex-col items-center justify-center px-10">
         <h2 className="text-4xl font-bold mb-4 text-gray-900">
           Welcome Octopus!
@@ -53,7 +49,7 @@ export default function LoginPage(): JSX.Element {
           Manage your smart signage, watch your company grow.
         </p>
 
-        <form className="w-full max-w-sm" onSubmit={handleSubmit}>
+        <form className="w-full max-w-sm">
           <div className="mb-4">
             <label
               htmlFor="email"
