@@ -1,15 +1,37 @@
 import Image from "next/image";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "octopus_task/store";
+import { login } from "octopus_task/store/slices/authSlice";
+import { useRouter } from "next/router";
 
 export default function LoginPage(): JSX.Element {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { status, error, token } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    dispatch(login({ username, password }));
+  };
+
+  // Token varsa /products sayfasına yönlendiriyoruz.
+  useEffect(() => {
+    if (token) {
+      console.log("çalıştı");
+      router.push("/products");
+    }
+  }, [token, router]);
 
   return (
     <div className="flex h-screen">
-      {/* Sol Taraftaki Alan */}
       <div className="w-2/3 bg-gray-100 flex flex-col items-center justify-center p-10">
-        {/* Logo */}
         <div className="absolute top-8 left-8">
           <Image
             src="/assets/images/octopus-logo.png"
@@ -34,13 +56,10 @@ export default function LoginPage(): JSX.Element {
           <p className="text-left text-gray-600">
             No design degree is required! Effortlessly craft and design stunning
             and captivating content using our user-friendly creative editor.
-            With our drag-and-drop technology, anyone can create amazing
-            marketing materials in.
           </p>
         </div>
       </div>
 
-      {/* Sağ taraftaki login formu alanı */}
       <div className="bg-white w-1/2 flex flex-col items-center justify-center px-10">
         <h2 className="text-4xl font-bold mb-4 text-gray-900">
           Welcome Octopus!
@@ -49,18 +68,20 @@ export default function LoginPage(): JSX.Element {
           Manage your smart signage, watch your company grow.
         </p>
 
-        <form className="w-full max-w-sm">
+        <form onSubmit={handleSubmit} className="w-full max-w-sm">
           <div className="mb-4">
             <label
               htmlFor="email"
               className="block text-sm font-bold text-gray-700 mb-1"
             >
-              E-mail Address*
+              Username*
             </label>
             <input
-              type="email"
-              id="email"
-              placeholder="Enter your e-mail address"
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
               className="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-500 text-sm"
               required
             />
@@ -69,13 +90,15 @@ export default function LoginPage(): JSX.Element {
           <div className="mb-4 relative">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-bold text-gray-700 mb-1"
             >
               Password*
             </label>
             <input
               type={showPassword ? "text" : "password"}
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="appearance-none w-full px-3 py-2 text-gray-500 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               required
@@ -106,11 +129,16 @@ export default function LoginPage(): JSX.Element {
             </label>
           </div>
 
+          {status === "failed" && error && (
+            <p className="text-red-500 text-sm mb-4">{error}</p>
+          )}
+
           <button
             type="submit"
             className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors"
+            disabled={status === "loading"}
           >
-            Login
+            {status === "loading" ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

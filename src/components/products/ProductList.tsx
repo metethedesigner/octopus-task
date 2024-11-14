@@ -8,6 +8,7 @@ import {
   fetchCategories,
   fetchProductsByCategory,
 } from "octopus_task/store/slices/categorySlice";
+import Link from "next/link";
 
 export default function ProductList(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
@@ -186,16 +187,21 @@ export default function ProductList(): JSX.Element {
           <div className="grid grid-cols-3 gap-6">
             {displayedProducts.map((product) => (
               <div key={product.id} className="rounded-md p-4">
-                <Image
-                  src={product.thumbnail}
-                  alt={product.title}
-                  width={310}
-                  height={150}
-                  className="object-cover mb-4"
-                />
-                <h3 className="text-lg text-gray-900 font-semibold mb-2">
+                <Link href={`/products/${product.id}`}>
+                  <Image
+                    src={product.thumbnail}
+                    alt={product.title}
+                    width={310}
+                    height={150}
+                    className="object-cover mb-4 cursor-pointer"
+                  />
+                </Link>
+                <Link
+                  className="text-lg text-gray-900 font-semibold mb-2 hover:underline"
+                  href={`/products/${product.id}`}
+                >
                   {product.title}
-                </h3>
+                </Link>
                 <p className="text-gray-600 mb-2">{product.brand}</p>
                 <p className="font-extrabold text-gray-900 text-lg mb-2">
                   {product.price} ₺
