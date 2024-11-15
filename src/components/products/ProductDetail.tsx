@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProductDetail,
+  ProductDetailState,
   Review,
 } from "octopus_task/store/slices/productDetailSlice";
 import { AppDispatch, RootState } from "octopus_task/store";
@@ -13,7 +14,10 @@ import { addToCart } from "octopus_task/store/slices/cartSlice";
 import Head from "next/head";
 
 export default function ProductDetail() {
-  const { product } = useSelector((state: RootState) => state.productDetail);
+  const { product } = useSelector(
+    (state: RootState) =>
+      state.productDetail as { product: ProductDetailState | null }
+  );
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();

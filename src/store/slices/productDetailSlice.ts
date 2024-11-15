@@ -10,9 +10,10 @@ export const fetchProductDetail = createAsyncThunk(
   }
 );
 
-interface ProductDetailState {
+export interface ProductDetailState {
   product: unknown | null;
   status: "idle" | "loading" | "succeeded" | "failed";
+  images: string[];
 }
 
 // Ürün yorumları için interface tanımı yapıyoruz.
@@ -27,6 +28,7 @@ export interface Review {
 const initialState: ProductDetailState = {
   product: null,
   status: "idle",
+  images: [],
 };
 
 const productDetailSlice = createSlice({
