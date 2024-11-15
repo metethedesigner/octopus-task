@@ -28,8 +28,18 @@ export const searchProducts = createAsyncThunk(
   }
 );
 
+export interface Product {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  thumbnail: string;
+  brand: string;
+  rating: number;
+}
+
 interface ProductState {
-  items: unknown[];
+  items: Product[];
   total: number;
   searchResults: unknown[];
   status: "idle" | "loading" | "succeeded" | "failed";

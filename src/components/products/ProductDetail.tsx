@@ -75,8 +75,7 @@ export default function ProductDetail() {
                   onClick={handlePreviousImage}
                   className="absolute left-6 p-2 bg-white border rounded-full shadow-md hover:bg-gray-200"
                 >
-                  <FiChevronLeft size={24} color="black" />{" "}
-                  {/* Sol ok simgesi */}
+                  <FiChevronLeft size={24} color="black" />
                 </button>
 
                 <Image
@@ -84,15 +83,14 @@ export default function ProductDetail() {
                   alt={product.title}
                   width={500}
                   height={500}
-                  className="object-contain"
+                  className="object-contain max-w-full max-h-full"
                 />
 
                 <button
                   onClick={handleNextImage}
                   className="absolute right-6 p-2 border rounded-full shadow-md hover:bg-gray-200"
                 >
-                  <FiChevronRight size={24} color="black" />{" "}
-                  {/* Sağ ok simgesi */}
+                  <FiChevronRight size={24} color="black" />
                 </button>
               </div>
 

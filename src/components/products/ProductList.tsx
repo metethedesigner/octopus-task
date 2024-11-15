@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProducts,
+  Product,
   searchProducts,
 } from "octopus_task/store/slices/productSlice";
 import { AppDispatch, RootState } from "octopus_task/store";
@@ -90,10 +91,10 @@ export default function ProductList(): JSX.Element {
   };
 
   // Görüntülenecek ürünleri ve sayılarını belirliyoruz
-  const displayedProducts = query.trim()
-    ? searchResults
+  const displayedProducts: Product[] = query.trim()
+    ? (searchResults as Product[])
     : appliedCategory
-    ? selectedCategoryProducts
+    ? (selectedCategoryProducts as Product[])
     : products;
 
   const currentTotal = query.trim()

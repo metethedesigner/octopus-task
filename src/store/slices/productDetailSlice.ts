@@ -11,6 +11,11 @@ export const fetchProductDetail = createAsyncThunk(
 );
 
 export interface ProductDetailState {
+  reviews: Review[];
+  price: number;
+  description: string;
+  title: string;
+  id: number;
   product: unknown | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   images: string[];
@@ -29,6 +34,11 @@ const initialState: ProductDetailState = {
   product: null,
   status: "idle",
   images: [],
+  id: 0,
+  reviews: [],
+  price: 0,
+  description: "",
+  title: "",
 };
 
 const productDetailSlice = createSlice({
