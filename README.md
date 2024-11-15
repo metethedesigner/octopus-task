@@ -4,12 +4,12 @@
 Live Demo Link: https://soft-meringue-dd86ab.netlify.app
 
 ## Tools used
-1. React
+1. React.js
 2. Next.js
 3. TypeScript
 4. Redux Toolkit
 5. Axios
-8. React-Toasitfy
+8. React-Toastify
 9. TailwindCSS
 10. React-Icons
 11. Dummyjson for Backend
