@@ -5,11 +5,20 @@ import axiosInstance from "octopus_task/utils/axiosInstance";
 export const login = createAsyncThunk(
   "auth/login",
   async (
-    credentials: { username: string; password: string },
+    {
+      username,
+      password,
+      rememberMe,
+    }: { username: string; password: string; rememberMe: boolean },
     { rejectWithValue }
   ) => {
     try {
-      const response = await axiosInstance.post("/auth/login", credentials);
+      const expiresInMins = rememberMe ? 120 : 30; // Kullanıcı loginde "remember me" seçtiyse token süresini 2 saate çıkarıyoruz. Seçmediyse 30 dakika.
+      const response = await axiosInstance.post("/auth/login", {
+        username,
+        password,
+        expiresInMins,
+      });
       const user = response.data;
       localStorage.setItem("token", user.accessToken);
       localStorage.setItem("user", JSON.stringify(user));
@@ -17,6 +26,20 @@ export const login = createAsyncThunk(
     } catch (error: any) {
       console.log(error);
       return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+// Token geçerliliğini burada kontrol ediyoruz.
+export const checkTokenValidity = createAsyncThunk(
+  "auth/checkTokenValidity",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/auth/me");
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue("Token geçerliliğini kaybetti.");
     }
   }
 );
@@ -32,7 +55,7 @@ interface AuthState {
   error: string | null;
 }
 
-// localStorage'dan token ve user verilerini alıyoruz ve userı JSON parse et
+// localStorage'dan token ve user verilerini alıyoruz ve userı JSON parse ediyoruz.
 const initialToken =
   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 const initialUser =
@@ -60,6 +83,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Klasik login reducerları
       .addCase(login.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -72,6 +96,14 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
+      })
+
+      // Token kontrolü sonrası token expire olduysa kullanıcıyı çıkış yaptıracağız.
+      .addCase(checkTokenValidity.rejected, (state) => {
+        state.token = null;
+        state.user = null;
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       });
   },
 });

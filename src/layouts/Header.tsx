@@ -47,7 +47,6 @@ export function Header(): JSX.Element {
       </div>
       {/* Sağ taraf kullanıcı bilgisi */}
       <div className="flex items-center space-x-6">
-        <FaSearch className="text-gray-600 cursor-pointer text-xl" />
         {isClient && (
           <div
             className="flex items-center space-x-4 cursor-pointer relative"
@@ -55,7 +54,9 @@ export function Header(): JSX.Element {
             onMouseLeave={() => setDropdownOpen(false)}
           >
             <FaUserCircle size={36} className="text-gray-600 text-2xl" />
-            <span className="font-medium text-gray-700">{user?.firstName}</span>
+            <span className="font-medium text-gray-700">
+              {user?.firstName ? user?.firstName : "username"}
+            </span>
             <FaChevronDown size={16} className="text-gray-600" />
 
             {dropdownOpen && (

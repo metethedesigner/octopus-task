@@ -2,21 +2,28 @@ import { useEffect, useState } from "react";
 import { Header } from "octopus_task/layouts/Header";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "octopus_task/store/slices/productSlice";
+import {
+  fetchProducts,
+  searchProducts,
+} from "octopus_task/store/slices/productSlice";
 import { AppDispatch, RootState } from "octopus_task/store";
 import {
   fetchCategories,
   fetchProductsByCategory,
 } from "octopus_task/store/slices/categorySlice";
 import Link from "next/link";
+import { addToCart } from "octopus_task/store/slices/cartSlice";
+import Head from "next/head";
 
 export default function ProductList(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
 
   // Ürünler
-  const { items: products, total } = useSelector(
-    (state: RootState) => state.product
-  );
+  const {
+    items: products,
+    searchResults,
+    total,
+  } = useSelector((state: RootState) => state.product);
 
   // Kategoriler
   const { categories, selectedCategoryProducts, selectedCategoryTotal } =
@@ -27,6 +34,7 @@ export default function ProductList(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const [appliedCategory, setAppliedCategory] = useState<string | null>(null);
   const [appliedPage, setAppliedPage] = useState(1);
+  const [query, setQuery] = useState("");
   const productsPerPage = 9;
 
   // totalPages, seçilen kategori varsa onu yoksa genel listeyi hesaplayacak şekilde oluşturduk.
@@ -49,6 +57,13 @@ export default function ProductList(): JSX.Element {
       dispatch(fetchProducts(appliedPage));
     }
   }, [dispatch, appliedCategory, appliedPage]);
+
+  // Arama barına yazı yazdığımızda arama isteğini tetikliyoruz burada.
+  useEffect(() => {
+    if (query.trim()) {
+      dispatch(searchProducts(query));
+    }
+  }, [query, dispatch]);
 
   // Sayfa güncelleme fonksiyonumuz, filtreleme yaptığımızda gelen ürün sayısına göre sayfayı güncelliyoruz.
   const handlePageChange = (page: number) => {
@@ -74,16 +89,23 @@ export default function ProductList(): JSX.Element {
     setAppliedPage(currentPage);
   };
 
-  // Kategori seçili ise seçilene göre değil ise genel ürün listesine göre ürün listeliyor ve totali güncelliyoruz.
-  const displayedProducts = appliedCategory
+  // Görüntülenecek ürünleri ve sayılarını belirliyoruz
+  const displayedProducts = query.trim()
+    ? searchResults
+    : appliedCategory
     ? selectedCategoryProducts
     : products;
-  const currentTotal = appliedCategory ? selectedCategoryTotal : total;
 
-  // Sayfalama yaparken seçili sayfanın öncesinde ve sonrasında maks 2 adet sayfa kutucuğu gösterecek şekilde tasarım düzenlemesi yapıyorum.
+  const currentTotal = query.trim()
+    ? searchResults.length
+    : appliedCategory
+    ? selectedCategoryTotal
+    : total;
+
+  // Sayfalama yaparken seçili sayfanın öncesinde ve sonrasında maks 1 adet sayfa kutucuğu gösterecek şekilde tasarım düzenlemesi yapıyoruz.
   const renderPageNumbers = () => {
     const pageNumbers = [];
-    const range = 2;
+    const range = 1;
 
     if (currentPage > 1 + range) {
       pageNumbers.push(1);
@@ -131,8 +153,18 @@ export default function ProductList(): JSX.Element {
     );
   };
 
+  // Ürünü sepete eklediğimiz fonksiyonu
+  const handleAddToCart = (productId: number) => {
+    const productData = { productId, quantity: 1 };
+    dispatch(addToCart(productData));
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Sayfa Başlığı */}
+      <Head>
+        <title>Product List</title>
+      </Head>
       {/* Header Alanı*/}
       <div className="h-20">
         <Header />
@@ -144,14 +176,16 @@ export default function ProductList(): JSX.Element {
           <div className="mb-6">
             <input
               type="text"
-              placeholder="Quick search"
-              className="w-full px-3 py-2 border rounded-md"
+              placeholder="Hızlı Arama"
+              className="w-full px-3 py-2 border rounded-md text-gray-900"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
           </div>
 
           <h3 className="font-bold text-xl text-gray-900 mb-4">Kategoriler</h3>
           <div className="border-b-4 border-black mb-4"></div>
-          <ul className="max-h-96 px-4 overflow-y-scroll custom-scrollbar">
+          <ul className="max-h-96 px-4 py-2 overflow-y-scroll custom-scrollbar">
             {categories.map((category) => (
               <li key={category.slug} className="mb-2">
                 <input
@@ -179,50 +213,58 @@ export default function ProductList(): JSX.Element {
           </button>
         </aside>
 
-        {/* Ürün Listesi Alanımız */}
+        {/* Ürün Listeleme Alanımız */}
         <section className="flex-grow p-12">
           <h2 className="text-2xl font-bold mb-6 text-gray-900">
             {currentTotal} Ürün Listeleniyor
           </h2>
           <div className="grid grid-cols-3 gap-6">
             {displayedProducts.map((product) => (
-              <div key={product.id} className="rounded-md p-4">
+              <div
+                key={product.id}
+                className="h-full flex flex-col rounded-md p-4 border border-gray-200"
+              >
                 <Link href={`/products/${product.id}`}>
                   <Image
                     src={product.thumbnail}
                     alt={product.title}
                     width={310}
-                    height={150}
+                    height={100}
                     className="object-cover mb-4 cursor-pointer"
                   />
                 </Link>
-                <Link
-                  className="text-lg text-gray-900 font-semibold mb-2 hover:underline"
-                  href={`/products/${product.id}`}
-                >
-                  {product.title}
-                </Link>
-                <p className="text-gray-600 mb-2">{product.brand}</p>
-                <p className="font-extrabold text-gray-900 text-lg mb-2">
-                  {product.price} ₺
-                </p>
-                <div className="flex items-center mb-4">
-                  {Array(5)
-                    .fill(0)
-                    .map((_, index) => (
-                      <span
-                        key={index}
-                        className={`text-2xl ${
-                          index < product.rating
-                            ? "text-black"
-                            : "text-gray-300"
-                        }`}
-                      >
-                        &#9733;
-                      </span>
-                    ))}
+                <div className="flex-grow">
+                  <Link
+                    className="text-lg text-gray-900 font-semibold mb-2 hover:underline"
+                    href={`/products/${product.id}`}
+                  >
+                    {product.title}
+                  </Link>
+                  <p className="text-gray-600 mb-2">{product.brand}</p>
+                  <p className="font-extrabold text-gray-900 text-lg mb-2">
+                    {product.price} ₺
+                  </p>
+                  <div className="flex items-center mb-4">
+                    {Array(5)
+                      .fill(0)
+                      .map((_, index) => (
+                        <span
+                          key={index}
+                          className={`text-2xl ${
+                            index < product.rating
+                              ? "text-black"
+                              : "text-gray-300"
+                          }`}
+                        >
+                          &#9733;
+                        </span>
+                      ))}
+                  </div>
                 </div>
-                <button className="w-full bg-buttonGreen text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors">
+                <button
+                  onClick={() => handleAddToCart(product.id)}
+                  className="w-full bg-buttonGreen text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors mt-4"
+                >
                   Sepete Ekle
                 </button>
               </div>
@@ -237,7 +279,7 @@ export default function ProductList(): JSX.Element {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 font-semibold border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700  disabled:text-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 font-semibold border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
                   Prev
                 </button>
@@ -247,7 +289,7 @@ export default function ProductList(): JSX.Element {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-gray-900 font-semibold border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700  disabled:text-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center px-3 h-8 leading-tight text-gray-900 font-semibold border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

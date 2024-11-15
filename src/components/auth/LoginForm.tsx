@@ -5,20 +5,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "octopus_task/store";
 import { login } from "octopus_task/store/slices/authSlice";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export default function LoginPage(): JSX.Element {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
+  //Stateler
+  const [username, setUsername] = useState("emilys");
+  const [password, setPassword] = useState("emilyspass");
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { status, error, token } = useSelector(
     (state: RootState) => state.auth
   );
 
+  // Logini çağırıp form bilgilerini vererek istek atıyoruz.
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    dispatch(login({ username, password }));
+    dispatch(login({ username, password, rememberMe }));
   };
 
   // Token varsa /products sayfasına yönlendiriyoruz.
@@ -31,6 +36,10 @@ export default function LoginPage(): JSX.Element {
 
   return (
     <div className="flex h-screen">
+      {/* Sayfa Başlığı */}
+      <Head>
+        <title>Welcome to Octopus!</title>
+      </Head>
       <div className="w-2/3 bg-gray-100 flex flex-col items-center justify-center p-10">
         <div className="absolute top-8 left-8">
           <Image
@@ -118,12 +127,14 @@ export default function LoginPage(): JSX.Element {
           <div className="flex items-center mb-4">
             <input
               type="checkbox"
-              id="remember"
-              className="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300 rounded"
+              id="rememberMe"
+              className="rounded outline-none"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
             />
             <label
-              htmlFor="remember"
-              className="ml-2 block text-sm text-gray-700 rounded-lg"
+              htmlFor="rememberMe"
+              className="ml-2 block text-sm text-gray-700"
             >
               Remember me?
             </label>

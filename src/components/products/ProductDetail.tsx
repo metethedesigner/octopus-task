@@ -6,22 +6,24 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { Header } from "octopus_task/layouts/Header";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { addToCart } from "octopus_task/store/slices/cartSlice";
+import Head from "next/head";
 
 export default function ProductDetail() {
+  const { product } = useSelector((state: RootState) => state.productDetail);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { id } = router.query;
 
-  const { product } = useSelector((state: RootState) => state.productDetail);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  // Routerdan ürün ID'sini alarak ürün detayına istek atıyoruz.
   useEffect(() => {
     if (id) {
       dispatch(fetchProductDetail(id as string));
     }
   }, [dispatch, id]);
 
-  // Resim değiştirme fonksiyonları
+  // Resim değiştirme fonksiyonlarımız.
   const handleNextImage = () => {
     if (product?.images) {
       setCurrentImageIndex(
@@ -38,8 +40,22 @@ export default function ProductDetail() {
     }
   };
 
+  // Ürünü sepete eklediğimiz fonksiyonumuz.
+  const handleAddToCart = () => {
+    if (product) {
+      const productData = { productId: product.id, quantity: 1 };
+      dispatch(addToCart(productData));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Sayfa Başlığı */}
+      <Head>
+        <title>Product Detail</title>
+      </Head>
+
+      {/* Header */}
       <Header />
 
       <div className="container mx-auto pt-8 pb-24 flex">
@@ -199,7 +215,10 @@ export default function ProductDetail() {
         {/* Fiyat ve Sepete Ekle Butonu */}
         <div className="flex items-center space-x-6">
           <p className="text-3xl font-bold text-gray-900">₺{product?.price}</p>
-          <button className="bg-buttonGreen text-white px-6 py-3 rounded-lg hover:bg-green-600">
+          <button
+            onClick={handleAddToCart}
+            className="bg-buttonGreen text-white px-6 py-3 rounded-lg hover:bg-green-600"
+          >
             Sepete Ekle
           </button>
         </div>

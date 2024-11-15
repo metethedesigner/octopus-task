@@ -14,16 +14,33 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+// Ürün aramak için thunk fonksiyonumuz.
+export const searchProducts = createAsyncThunk(
+  "product/searchProducts",
+  async (query: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/products/search?q=${query}`);
+      return response.data.products;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Arama hatası");
+    }
+  }
+);
+
 interface ProductState {
   items: any[];
   total: number;
+  searchResults: any[];
   status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
 }
 
 const initialState: ProductState = {
   items: [],
   total: 0,
+  searchResults: [],
   status: "idle",
+  error: null,
 };
 
 const productSlice = createSlice({
@@ -32,6 +49,7 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Klasik ürün çekme reducerları
       .addCase(fetchProducts.pending, (state) => {
         state.status = "loading";
       })
@@ -42,6 +60,21 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state) => {
         state.status = "failed";
+      })
+
+      // Ürünlerde Search reducerları
+      .addCase(searchProducts.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        state.searchResults = [];
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.searchResults = action.payload;
+      })
+      .addCase(searchProducts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || null;
       });
   },
 });
