@@ -3,8 +3,9 @@ import { useDispatch } from "react-redux";
 import { checkTokenValidity } from "octopus_task/store/slices/authSlice";
 import { AppDispatch } from "octopus_task/store";
 
-const withTokenCheck = (WrappedComponent: any) => {
-  return (props: any) => {
+const withTokenCheck = (WrappedComponent: unknown) => {
+  // eslint-disable-next-line react/display-name
+  return (props: unknown) => {
     const dispatch = useDispatch<AppDispatch>();
 
     // 1 dakikada bir istek atacak şekilde interval yazıyoruz ve düzenli olarka token geçerliliğini kontrol ediyoruz.

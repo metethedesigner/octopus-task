@@ -25,7 +25,7 @@ export const fetchProductsByCategory = createAsyncThunk(
 
 interface CategoryState {
   categories: { slug: string; name: string; url: string }[];
-  selectedCategoryProducts: any[];
+  selectedCategoryProducts: unknown[];
   selectedCategoryTotal: number;
   status: "idle" | "loading" | "succeeded" | "failed";
 }

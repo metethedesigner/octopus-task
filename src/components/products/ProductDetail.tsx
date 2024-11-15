@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductDetail } from "octopus_task/store/slices/productDetailSlice";
+import {
+  fetchProductDetail,
+  Review,
+} from "octopus_task/store/slices/productDetailSlice";
 import { AppDispatch, RootState } from "octopus_task/store";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -27,14 +30,14 @@ export default function ProductDetail() {
   const handleNextImage = () => {
     if (product?.images) {
       setCurrentImageIndex(
-        (prevIndex: any) => (prevIndex + 1) % product.images.length
+        (prevIndex: number) => (prevIndex + 1) % product.images.length
       );
     }
   };
 
   const handlePreviousImage = () => {
     if (product?.images) {
-      setCurrentImageIndex((prevIndex: any) =>
+      setCurrentImageIndex((prevIndex: number) =>
         prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
       );
     }
@@ -163,7 +166,7 @@ export default function ProductDetail() {
                   Ürün Yorumları
                 </h2>
                 <div className="space-y-4">
-                  {product.reviews?.map((review: any, index: number) => (
+                  {product.reviews?.map((review: Review, index: number) => (
                     <div key={index} className="border-b pb-4 mb-4">
                       <div className="flex items-center">
                         <p className="font-semibold mr-2 text-gray-900">

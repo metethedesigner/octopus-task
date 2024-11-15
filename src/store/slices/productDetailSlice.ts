@@ -11,8 +11,17 @@ export const fetchProductDetail = createAsyncThunk(
 );
 
 interface ProductDetailState {
-  product: any | null;
+  product: unknown | null;
   status: "idle" | "loading" | "succeeded" | "failed";
+}
+
+// Ürün yorumları için interface tanımı yapıyoruz.
+export interface Review {
+  rating: number;
+  comment: string;
+  date: string;
+  reviewerName: string;
+  reviewerEmail: string;
 }
 
 const initialState: ProductDetailState = {

@@ -21,6 +21,7 @@ export const searchProducts = createAsyncThunk(
     try {
       const response = await axiosInstance.get(`/products/search?q=${query}`);
       return response.data.products;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Arama hatası");
     }
@@ -28,9 +29,9 @@ export const searchProducts = createAsyncThunk(
 );
 
 interface ProductState {
-  items: any[];
+  items: unknown[];
   total: number;
-  searchResults: any[];
+  searchResults: unknown[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { AppDispatch, RootState } from "octopus_task/store";
 import { logout } from "octopus_task/store/slices/authSlice";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaSearch, FaUserCircle } from "react-icons/fa";
+import { FaChevronDown, FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
 export function Header(): JSX.Element {

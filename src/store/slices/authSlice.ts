@@ -23,6 +23,7 @@ export const login = createAsyncThunk(
       localStorage.setItem("token", user.accessToken);
       localStorage.setItem("user", JSON.stringify(user));
       return user;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       return rejectWithValue(error.response.data.message);
@@ -37,6 +38,7 @@ export const checkTokenValidity = createAsyncThunk(
     try {
       const response = await axiosInstance.get("/auth/me");
       return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       return rejectWithValue("Token geçerliliğini kaybetti.");

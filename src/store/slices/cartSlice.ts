@@ -22,6 +22,7 @@ export const addToCart = createAsyncThunk(
         products: [productData],
       });
       return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || "Sepete eklenemedi"
